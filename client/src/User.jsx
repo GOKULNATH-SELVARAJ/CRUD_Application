@@ -2,9 +2,11 @@ import axios from "axios";
 import "./App.css";
 import logo from "./assests/logoFirst.svg";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function User() {
+  const navigate = useNavigate();
+  const [logout, setLogout] = useState(false)
   const [users, setUsers] = useState([
     {
       firstName: "yourself",
@@ -13,6 +15,16 @@ function User() {
       phoneNumber: 9404484940,
     },
   ]);
+  //logout function
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem('auth');
+    setLogout(true)
+  }
+
+  useEffect(() => {
+    if (!localStorage.getItem("auth")) navigate("/login");
+  }, [logout]);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -27,19 +39,24 @@ function User() {
   }, []);
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this user?");
-    
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this user?"
+    );
+
     if (confirmed) {
       try {
-        const response = await axios.delete(`http://localhost:3001/deleteuser/${id}`);
+        const response = await axios.delete(
+          `http://localhost:3001/deleteuser/${id}`
+        );
         console.log(response);
         window.location.reload();
       } catch (err) {
         console.error(err);
       }
     }
+
+   
   };
-  
 
   return (
     <div>
@@ -48,11 +65,17 @@ function User() {
       </div>
       <div className="container ">
         <div className="custom-box ">
-          <div className="d-flex justify-content-end ">
+          <div className="create-log-btn">
+            <button
+              className="btn btn-danger"
+              onClick={ handleLogout }   >
+              Logout
+            </button>
             <Link to="/create" className="btn btn-success ">
               Add +
             </Link>
           </div>
+
           <table className="table">
             <thead>
               <tr>
@@ -61,7 +84,7 @@ function User() {
                 <th>Last Name</th>
                 <th>Phone Number</th>
                 <th>Date</th>
-                <th >Action</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>

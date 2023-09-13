@@ -5,6 +5,7 @@ import User from './User'
 import CreateUser from './CreateUser'
 import UpdateUser from './UpdateUser'
 import ViewUser from './ViewUser'
+import Login from './Login/login'
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     <div>
       <BrowserRouter>
       <Routes>
+        <Route path='/login' element={<Login/>}></Route>
         <Route path='/user' element={<User/>}></Route>
         <Route path='/create' element={<CreateUser />}></Route>
         <Route path='/update/:id' element={<UpdateUser />}></Route>

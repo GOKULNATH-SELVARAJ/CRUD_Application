@@ -51,6 +51,11 @@ body {
   justify-content: center;
 }
 
+.create-log-btn{
+  display: flex;
+  justify-content: start;
+  column-gap: 46rem;
+}
 
 .btn {
   display: inline-block;

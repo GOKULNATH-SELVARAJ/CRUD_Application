@@ -9,6 +9,7 @@ const UserSchema = mongoose.Schema({
     phoneNumber:Number,
     address:String,
     dob:String,
+    password:String,
     updatedAt: {
         type: Date,
         default: Date.now, 
@@ -75,6 +76,27 @@ app.put('/updateuser/:id', async (req, res) => {
     }
 });
 
+app.get('/login', async (req,res) =>{
+
+})
+
+app.post('/check-mail', async (req, res) =>{
+    try {
+        const { email } = req.body;
+    
+        // Check if the email exists in the database
+        const existingUser = await UserModel.findOne({ email });
+    
+        if (existingUser) {
+          return res.json({ exists: true });
+        } else {
+          return res.json({ exists: false });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+})
 
 app.post("/createUser", async (req, res) => {
     try {

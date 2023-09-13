@@ -9,18 +9,26 @@ import Label from "./components/Label";
 
 function CreateUser() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [address, setAddress] = useState("");
   const [dob, setDob] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [isValidEmail, setIsValidEmail] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
   const [isValidFname, setIsValidFname] = useState(true);
   const [isValidLname, setIsValidLname] = useState(true);
   const [isValidPhno, setIsValidPhno] = useState(true);
   const [isValidDob, setIsValidDob] = useState(true);
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   const validateEmail = (value) => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(value);
@@ -34,6 +42,21 @@ function CreateUser() {
       setIsValidEmail(true);
     } else {
       setIsValidEmail(false);
+    }
+  };
+
+  const validatePassword = (value) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(value);
+  };
+
+  const handlePasswordChange = (e) => {
+    const newValue = e.target.value;
+    setPassword(newValue);
+    if (validatePassword(newValue)) {
+      setIsValidPassword(true);
+    } else {
+      setIsValidPassword(false);
     }
   };
 
@@ -105,12 +128,26 @@ function CreateUser() {
   const Submit = async (e) => {
     e.preventDefault();
 
-    if (!email || !firstName || !lastName || !phoneNumber || !dob) {
+    if (
+      !email ||
+      !firstName ||
+      !lastName ||
+      !phoneNumber ||
+      !dob ||
+      !password
+    ) {
       alert("All fields are required.");
       return;
     }
 
-    if (!isValidEmail || !isValidFname || !isValidLname || !isValidPhno || !isValidDob) {
+    if (
+      !isValidEmail ||
+      !isValidFname ||
+      !isValidLname ||
+      !isValidPhno ||
+      !isValidDob ||
+      !isValidPassword
+    ) {
       alert("Enter valid information.");
       return;
     }
@@ -118,6 +155,7 @@ function CreateUser() {
     try {
       const newData = await axios.post("http://localhost:3001/createuser", {
         email,
+        password,
         firstName,
         lastName,
         phoneNumber,
@@ -132,7 +170,7 @@ function CreateUser() {
         alert(err.response.data.error);
         setError(err.response.data.error);
       } else {
-        alert("An error occurred")
+        alert("An error occurred");
         setError("An error occurred");
       }
     }
@@ -147,23 +185,6 @@ function CreateUser() {
         <div className="w-50 bg-white rounded p-4">
           <form className="form-class" onSubmit={Submit}>
             <h2>Register</h2>
-            <div className="row mb-2">
-              <Label text={"Email"} />
-              <div className="col-md-9">
-                <input
-                  type="text"
-                  className={`form-control ${isValidEmail ? "" : "is-invalid"}`}
-                  placeholder="Email"
-                  autoComplete="off"
-                  required="true"
-                  onChange={handleEmailChange}
-                />
-                {!isValidEmail && (
-                  <div className="invalid-feedback">Email is Invalid</div>
-                )}
-                
-              </div>
-            </div>
             <div className="row mb-2">
               <Label text={"First Name"} />
               <div className="col-md-9">
@@ -215,6 +236,71 @@ function CreateUser() {
               </div>
             </div>
             <div className="row mb-2">
+              <Label text={"Email"} />
+              <div className="col-md-9">
+                <input
+                  type="text"
+                  className={`form-control ${isValidEmail ? "" : "is-invalid"}`}
+                  placeholder="Email"
+                  autoComplete="off"
+                  required="true"
+                  onChange={handleEmailChange}
+                />
+                {!isValidEmail && (
+                  <div className="invalid-feedback">Email is Invalid</div>
+                )}
+              </div>
+            </div>
+            {/* Password */}
+            <div className="row mb-2">
+              <Label text={"Password"} />
+              <div className="col-md-9">
+                <div className="password-input">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`form-control ${
+                      isValidPassword ? "" : "is-invalid"
+                    }`}
+                    placeholder="Password"
+                    autoComplete="off"
+                    value={password}
+                    required="true"
+                    onChange={handlePasswordChange}
+                  />
+                  <label >
+                  <input
+                  type="checkbox"
+                  className="show-password-checkbox"
+                  onChange={toggleShowPassword}
+                />{ ' '}
+                Show Password
+                </label>
+                  {!isValidPassword && (
+                    <div className="invalid-feedback">Password is Invalid</div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="row mb-2">
+              <Label text={"Date of Birth"} />
+              <div className="col-md-9">
+                <input
+                  type="date"
+                  min="1950-01-01"
+                  max="2023-08-31"
+                  className={`form-control ${isValidDob ? "" : "is-invalid"}`}
+                  autoComplete="off"
+                  required="true"
+                  onChange={handleDobChange}
+                />
+                {!isValidDob && (
+                  <div className="invalid-feedback">
+                    Enter Valid Date of Birth
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="row mb-2">
               <Label text={"Address"} />
               <div className="col-md-9">
                 <textarea
@@ -226,23 +312,6 @@ function CreateUser() {
                   onChange={(e) => setAddress(e.target.value)}
                   rows={3}
                 />
-              </div>
-            </div>
-            <div className="row mb-2">
-              <Label text={"Date of Birth"} />
-              <div className="col-md-9">
-                <input
-                  type="date" min="1950-01-01" max="2023-08-31"
-                  className={`form-control ${isValidDob ? "" : "is-invalid"}`}
-                  autoComplete="off"
-                  required="true"
-                  onChange={handleDobChange}
-                />
-                {!isValidDob && (
-                  <div className="invalid-feedback">
-                    Enter Valid Date of Birth
-                  </div>
-                )}
               </div>
             </div>
             <div className="create-button">
